@@ -5,6 +5,7 @@ export const JWT_CONFIG_TOKEN = 'jwt';
 export const REDIS_CONFIG_TOKEN = 'redis';
 export const CACHE_CONFIG_TOKEN = 'cache';
 export const APP_CONFIG_TOKEN = 'app';
+export const BULL_CONFIG_TOKEN = 'bull';
 
 export const appConfig = registerAs(APP_CONFIG_TOKEN, () => ({
   nodeEnv: process.env.NODE_ENV!,
@@ -18,6 +19,7 @@ export const databaseConfig = registerAs(DATABASE_CONFIG_TOKEN, () => ({
   password: process.env.DB_PASSWORD!,
   database: process.env.DB_DATABASE!,
 }));
+export type DatabaseConfig = ReturnType<typeof databaseConfig>;
 
 export const jwtConfig = registerAs(JWT_CONFIG_TOKEN, () => ({
   secret: process.env.JWT_SECRET!,

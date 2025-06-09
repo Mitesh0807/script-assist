@@ -11,6 +11,7 @@ import { TaskProcessorModule } from './queues/task-processor/task-processor.modu
 import { ScheduledTasksModule } from './queues/scheduled-tasks/scheduled-tasks.module';
 import { CacheService } from './common/services/cache.service';
 import { AppConfigModule } from '@config/config.module';
+import { BULL_CONFIG_TOKEN, DATABASE_CONFIG_TOKEN, DatabaseConfig } from '@config/configuration';
 
 @Module({
   imports: [
@@ -21,17 +22,23 @@ import { AppConfigModule } from '@config/config.module';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get('DB_HOST'),
-        port: configService.get('DB_PORT'),
-        username: configService.get('DB_USERNAME'),
-        password: configService.get('DB_PASSWORD'),
-        database: configService.get('DB_DATABASE'),
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: configService.get('NODE_ENV') === 'development',
-        logging: configService.get('NODE_ENV') === 'development',
-      }),
+      useFactory: (configService: ConfigService) => {
+        const db = configService.get<DatabaseConfig>(DATABASE_CONFIG_TOKEN);
+        if (!db) {
+          throw new Error('Database configuration is missing');
+        }
+        return {
+          type: 'postgres',
+          host: db.host,
+          port: db.port,
+          username: db.username,
+          password: db.password,
+          database: db.database,
+          entities: [__dirname + '/**/*.entity{.ts,.js}'],
+          synchronize: configService.get('app.nodeEnv') === 'development',
+          logging: configService.get('app.nodeEnv') === 'development',
+        };
+      },
     }),
 
     // Scheduling
@@ -41,15 +48,16 @@ import { AppConfigModule } from '@config/config.module';
     BullModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        connection: {
-          host: configService.get('REDIS_HOST'),
-          port: configService.get('REDIS_PORT'),
-        },
-      }),
+      useFactory: (configService: ConfigService) => {
+        const bullConf = configService.getOrThrow(BULL_CONFIG_TOKEN);
+        return {
+          connection: bullConf.connection,
+        };
+      },
     }),
 
     // Rate limiting
+    // TODO:grab from config
     ThrottlerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

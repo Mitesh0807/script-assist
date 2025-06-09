@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { validationSchema } from './config.schema';
 import { appConfig, databaseConfig, jwtConfig, redisConfig, cacheConfig } from './configuration';
-import bullConfig from './bull.config';
+import { bullConfig } from './bull.config';
 
 @Module({
   imports: [
