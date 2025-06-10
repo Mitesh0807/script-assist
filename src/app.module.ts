@@ -17,7 +17,6 @@ import { BULL_CONFIG_TOKEN, DATABASE_CONFIG_TOKEN, DatabaseConfig } from '@confi
   imports: [
     // Configuration
     AppConfigModule,
-
     // Database
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],

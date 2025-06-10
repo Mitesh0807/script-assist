@@ -2,9 +2,16 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { CustomLoggerService } from '@common/services/logger.service';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    bufferLogs: true,
+  });
+
+  const logger = await app.resolve(CustomLoggerService);
+  logger.setContext('Bootstrap');
+  app.useLogger(logger);
 
   // Global validation pipe
   app.useGlobalPipes(
@@ -33,7 +40,7 @@ async function bootstrap() {
 
   const port = process.env.PORT || 3000;
   await app.listen(port);
-  console.log(`Application running on: http://localhost:${port}`);
-  console.log(`Swagger documentation: http://localhost:${port}/api`);
+  logger.info(`Application running on: http://localhost:${port}`);
+  logger.info(`Swagger documentation: http://localhost:${port}/api`);
 }
 bootstrap();
