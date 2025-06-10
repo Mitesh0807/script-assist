@@ -2,14 +2,17 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
 import { TasksService } from '../../modules/tasks/tasks.service';
+import { CustomLoggerService } from '@common/services/logger.service';
 
 @Injectable()
 @Processor('task-processing')
 export class TaskProcessorService extends WorkerHost {
-  private readonly logger = new Logger(TaskProcessorService.name);
-
-  constructor(private readonly tasksService: TasksService) {
+  constructor(
+    private readonly tasksService: TasksService,
+    private readonly logger: CustomLoggerService,
+  ) {
     super();
+    this.logger.setContext(TaskProcessorService.name);
   }
 
   // Inefficient implementation:

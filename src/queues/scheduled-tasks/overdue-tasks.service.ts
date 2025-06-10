@@ -6,17 +6,19 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { LessThan, Repository } from 'typeorm';
 import { Task } from '../../modules/tasks/entities/task.entity';
 import { TaskStatus } from '../../modules/tasks/enums/task-status.enum';
+import { CustomLoggerService } from '@common/services/logger.service';
 
 @Injectable()
 export class OverdueTasksService {
-  private readonly logger = new Logger(OverdueTasksService.name);
-
   constructor(
     @InjectQueue('task-processing')
     private taskQueue: Queue,
     @InjectRepository(Task)
     private tasksRepository: Repository<Task>,
-  ) {}
+    private readonly logger: CustomLoggerService,
+  ) {
+    this.logger.setContext(OverdueTasksService.name);
+  }
 
   // TODO: Implement the overdue tasks checker
   // This method should run every hour and check for overdue tasks

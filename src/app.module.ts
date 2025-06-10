@@ -12,11 +12,13 @@ import { ScheduledTasksModule } from './queues/scheduled-tasks/scheduled-tasks.m
 import { CacheService } from './common/services/cache.service';
 import { AppConfigModule } from '@config/config.module';
 import { BULL_CONFIG_TOKEN, DATABASE_CONFIG_TOKEN, DatabaseConfig } from '@config/configuration';
+import { LoggingModule } from '@common/services/logger.module';
 
 @Module({
   imports: [
     // Configuration
     AppConfigModule,
+    LoggingModule,
     // Database
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
